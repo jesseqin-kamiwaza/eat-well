@@ -11,6 +11,7 @@ import HowToCook from './views/HowToCook.vue'
 import SauceDesign from './views/SauceDesign.vue'
 import FortuneCooking from './views/FortuneCooking.vue'
 import SettingsDemo from './views/SettingsDemo.vue'
+import RecipeDetail from './views/RecipeDetail.vue'
 import { autoRefreshEnvSettings } from './utils/envWatcher'
 import './style.css'
 
@@ -24,7 +25,8 @@ const routes = [
     { path: '/how-to-cook', component: HowToCook, meta: { transition: 'slide-up' } },
     { path: '/sauce-design', component: SauceDesign, meta: { transition: 'slide-up' } },
     { path: '/fortune-cooking', component: FortuneCooking, meta: { transition: 'slide-up' } },
-    { path: '/settings-demo', component: SettingsDemo, meta: { transition: 'fade' } }
+    { path: '/settings-demo', component: SettingsDemo, meta: { transition: 'fade' } },
+    { path: '/recipe/:id', component: RecipeDetail, meta: { transition: 'slide-up' } }
 ]
 
 const router = createRouter({

@@ -23,6 +23,14 @@
                     </div>
                 </div>
                 <div class="flex items-center gap-2 flex-shrink-0">
+                    <!-- 查看详情按钮 -->
+                    <button
+                        @click="viewDetail"
+                        class="p-2 bg-white/20 hover:bg-white/30 rounded-lg active:scale-95 transition-all"
+                        title="查看详情"
+                    >
+                        <span class="text-lg">👁️</span>
+                    </button>
                     <!-- 收藏按钮 -->
                     <FavoriteButton v-if="showFavoriteButton" :recipe="recipe" @favorite-changed="onFavoriteChanged" />
                 </div>
@@ -249,6 +257,7 @@
 
 <script setup lang="ts">
 import { computed, ref, onUnmounted } from 'vue'
+import { useRouter } from 'vue-router'
 import type { Recipe } from '@/types'
 import { generateRecipeImage, type GeneratedImage } from '@/services/imageService'
 import { getNutritionAnalysis, getWinePairing } from '@/services/aiService'
@@ -257,6 +266,8 @@ import FavoriteButton from './FavoriteButton.vue'
 import NutritionAnalysis from './NutritionAnalysis.vue'
 import WinePairing from './WinePairing.vue'
 import ImageModal from './ImageModal.vue'
+
+const router = useRouter()
 
 interface Props {
     recipe: Recipe
@@ -361,6 +372,15 @@ const toggleExpanded = () => {
 // 处理收藏状态变化
 const onFavoriteChanged = (isFavorited: boolean) => {
     emit('favoriteChanged', isFavorited)
+}
+
+// 查看详情
+const viewDetail = () => {
+    // Store recipe temporarily
+    localStorage.setItem(`recipe_${props.recipe.id}`, JSON.stringify(props.recipe))
+
+    // Navigate to recipe detail
+    router.push(`/recipe/${props.recipe.id}`)
 }
 
 const generateImage = async () => {

@@ -4,8 +4,7 @@
             <!-- 主要信息 -->
             <div class="flex flex-col md:flex-row items-center justify-center gap-2 md:gap-4">
                 <p class="text-sm text-gray-600">
-                    © 2025 一饭封神 |
-                    <a href="https://github.com/liu-ziting/what-to-eat" target="_blank" class="text-blue-600 hover:text-blue-700 hover:underline transition-colors"> Github </a>
+                    © 2025 Jesse说AI
                 </p>
                 <p class="text-xs text-gray-500">🚀 Vibe Coding With Kiro AI</p>
             </div>
