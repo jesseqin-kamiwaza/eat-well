@@ -15,16 +15,16 @@ import { autoRefreshEnvSettings } from './utils/envWatcher'
 import './style.css'
 
 const routes = [
-    { path: '/', component: Home },
-    { path: '/about', component: About },
-    { path: '/today-eat', component: TodayEat },
-    { path: '/table-design', component: TableDesign },
-    { path: '/favorites', component: Favorites },
-    { path: '/gallery', component: Gallery },
-    { path: '/how-to-cook', component: HowToCook },
-    { path: '/sauce-design', component: SauceDesign },
-    { path: '/fortune-cooking', component: FortuneCooking },
-    { path: '/settings-demo', component: SettingsDemo }
+    { path: '/', component: Home, meta: { transition: 'fade' } },
+    { path: '/about', component: About, meta: { transition: 'fade' } },
+    { path: '/today-eat', component: TodayEat, meta: { transition: 'slide-left' } },
+    { path: '/table-design', component: TableDesign, meta: { transition: 'slide-left' } },
+    { path: '/favorites', component: Favorites, meta: { transition: 'slide-left' } },
+    { path: '/gallery', component: Gallery, meta: { transition: 'slide-left' } },
+    { path: '/how-to-cook', component: HowToCook, meta: { transition: 'slide-up' } },
+    { path: '/sauce-design', component: SauceDesign, meta: { transition: 'slide-up' } },
+    { path: '/fortune-cooking', component: FortuneCooking, meta: { transition: 'slide-up' } },
+    { path: '/settings-demo', component: SettingsDemo, meta: { transition: 'fade' } }
 ]
 
 const router = createRouter({
@@ -40,3 +40,31 @@ autoRefreshEnvSettings()
 
 // 挂载应用
 app.mount('#app')
+
+// Service Worker registration
+if ('serviceWorker' in navigator) {
+  window.addEventListener('load', () => {
+    navigator.serviceWorker.register('/sw.js')
+      .then((registration) => {
+        console.log('✅ Service Worker registered:', registration.scope)
+
+        // Check for updates
+        registration.addEventListener('updatefound', () => {
+          const newWorker = registration.installing
+          if (newWorker) {
+            newWorker.addEventListener('statechange', () => {
+              if (newWorker.state === 'installed' && navigator.serviceWorker.controller) {
+                // New version available
+                if (confirm('发现新版本，是否立即更新？')) {
+                  window.location.reload()
+                }
+              }
+            })
+          }
+        })
+      })
+      .catch((error) => {
+        console.error('❌ Service Worker registration failed:', error)
+      })
+  })
+}

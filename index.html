@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <link rel="shortcut icon" href="/favicon.ico" />
-        <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+        <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=5.0, user-scalable=yes, viewport-fit=cover" />
 
         <!-- 基础SEO -->
         <title>一饭封神 - AI智能菜谱生成平台</title>
@@ -20,17 +20,24 @@
         <!-- 移动端优化 -->
         <meta name="mobile-web-app-capable" content="yes" />
         <meta name="apple-mobile-web-app-capable" content="yes" />
-        <meta name="apple-mobile-web-app-status-bar-style" content="default" />
+        <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent" />
         <meta name="apple-mobile-web-app-title" content="一饭封神" />
         <meta name="application-name" content="一饭封神" />
-        <meta name="theme-color" content="#fbbf24" />
+        <meta name="theme-color" content="#f472b6" media="(prefers-color-scheme: light)" />
+        <meta name="theme-color" content="#1e293b" media="(prefers-color-scheme: dark)" />
         <meta name="msapplication-TileColor" content="#fbbf24" />
         <meta name="msapplication-navbutton-color" content="#fbbf24" />
 
+        <!-- PWA Manifest -->
+        <link rel="manifest" href="/manifest.json" />
+
         <!-- 图标和清单 -->
         <link rel="icon" type="image/x-icon" href="/favicon.ico" />
+        <link rel="apple-touch-icon" href="/icons/apple-icon-180.png" />
 
         <!-- 预连接和DNS预解析 -->
+        <link rel="preconnect" href="https://openrouter.ai" />
+        <link rel="dns-prefetch" href="https://openrouter.ai" />
         <link rel="preconnect" href="https://api.deepseek.com" />
         <link rel="preconnect" href="https://open.bigmodel.cn" />
         <link rel="dns-prefetch" href="https://fonts.googleapis.com" />

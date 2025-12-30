@@ -1,0 +1,33 @@
+<svg width="512" height="512" viewBox="0 0 512 512" xmlns="http://www.w3.org/2000/svg">
+  <defs>
+    <linearGradient id="gradient" x1="0%" y1="0%" x2="100%" y2="100%">
+      <stop offset="0%" style="stop-color:#fbbf24;stop-opacity:1" />
+      <stop offset="100%" style="stop-color:#f472b6;stop-opacity:1" />
+    </linearGradient>
+  </defs>
+
+  <!-- Background circle -->
+  <circle cx="256" cy="256" r="240" fill="url(#gradient)"/>
+
+  <!-- Bowl -->
+  <path d="M 160 280 Q 160 350, 256 370 Q 352 350, 352 280 L 340 280 Q 340 330, 256 345 Q 172 330, 172 280 Z"
+        fill="#ffffff" stroke="#000000" stroke-width="8"/>
+
+  <!-- Rice in bowl -->
+  <ellipse cx="256" cy="270" rx="80" ry="30" fill="#ffffff" opacity="0.8"/>
+  <ellipse cx="240" cy="260" rx="20" ry="15" fill="#ffffff"/>
+  <ellipse cx="272" cy="265" rx="18" ry="12" fill="#ffffff"/>
+  <ellipse cx="256" cy="250" rx="25" ry="18" fill="#ffffff"/>
+
+  <!-- Chopsticks -->
+  <g transform="translate(256, 256) rotate(-30)">
+    <rect x="-60" y="-4" width="140" height="8" rx="4" fill="#8B4513" stroke="#000000" stroke-width="3"/>
+  </g>
+  <g transform="translate(256, 256) rotate(-40)">
+    <rect x="-55" y="-4" width="140" height="8" rx="4" fill="#8B4513" stroke="#000000" stroke-width="3"/>
+  </g>
+
+  <!-- Star accent (for 封神 - becoming a god) -->
+  <path d="M 380 140 L 390 165 L 416 170 L 398 188 L 402 214 L 380 202 L 358 214 L 362 188 L 344 170 L 370 165 Z"
+        fill="#FFD700" stroke="#000000" stroke-width="2"/>
+</svg>
