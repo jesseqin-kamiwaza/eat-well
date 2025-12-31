@@ -26,7 +26,7 @@ const route = useRoute()
 
 const navItems = [
   { icon: '🏠', label: '生成', to: '/' },
-  { icon: '🎲', label: '盲盒', to: '/today-eat' },
+  { icon: '🔮', label: '玄学厨房', to: '/fortune-cooking' },
   { icon: '🍽️', label: '满汉', to: '/table-design' },
   { icon: '❤️', label: '收藏', to: '/favorites' }
 ]
