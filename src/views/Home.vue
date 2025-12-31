@@ -1,12 +1,9 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
-import { useRouter } from 'vue-router'
 import RecipeCard from '@/components/RecipeCard.vue'
 import { generateRecipe } from '@/services/aiService'
 import { cuisines } from '@/config/cuisines'
 import type { Recipe, CuisineType } from '@/types'
-
-const router = useRouter()
 
 // 状态管理
 const generating = ref(false)
@@ -202,10 +199,10 @@ const hasResults = computed(() => recipes.value.length > 0)
             />
             <button
               @click="addIngredient"
-              class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold rounded-lg
-                     border-2 border-black active:scale-95 transition-all text-lg"
+              class="px-4 py-2 bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-medium rounded-lg
+                     border-2 border-black active:scale-95 transition-all text-sm"
             >
-              ➕
+              添加
             </button>
           </div>
 
@@ -288,17 +285,6 @@ const hasResults = computed(() => recipes.value.length > 0)
             </button>
           </div>
         </div>
-
-        <!-- 拍照识别按钮（简化版） -->
-        <button
-          @click="router.push('/camera')"
-          class="w-full py-2.5 mb-3 bg-white text-gray-700 font-medium rounded-lg
-                 border-2 border-gray-300 hover:border-gray-400 active:scale-95 transition-all
-                 flex items-center justify-center gap-2"
-        >
-          <span class="text-lg">📷</span>
-          <span class="text-sm">拍照识别食材</span>
-        </button>
 
         <!-- 生成按钮 -->
         <button
