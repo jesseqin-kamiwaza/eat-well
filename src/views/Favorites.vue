@@ -111,18 +111,21 @@
             </div>
 
             <!-- 收藏列表 -->
-            <div v-if="filteredFavorites.length > 0" class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+            <div v-if="filteredFavorites.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
                 <div
                     v-for="favorite in filteredFavorites"
                     :key="favorite.id"
-                    class="bg-white border-2 border-[#0A0910] rounded-lg overflow-hidden hover:shadow-lg transition-all duration-200"
+                    class="flex flex-col"
                 >
-                    <!-- 收藏信息头部 -->
-                    <div class="bg-red-100 border-b-2 border-black p-3">
-                        <div class="flex items-center justify-between">
+                    <!-- 菜谱卡片 V2 - 大图布局 -->
+                    <RecipeCardV2 :recipe="favorite.recipe" :showFavoriteButton="false" />
+
+                    <!-- 收藏信息 - 卡片下方 -->
+                    <div class="mt-2 p-3 bg-white border-2 border-black rounded-lg">
+                        <div class="flex items-center justify-between mb-2">
                             <div class="flex items-center gap-2">
-                                <span class="text-red-500">❤️</span>
-                                <span class="text-sm text-gray-600">收藏于 {{ formatDate(favorite.favoriteDate) }}</span>
+                                <span class="text-red-500 text-sm">❤️</span>
+                                <span class="text-xs text-gray-600">{{ formatDate(favorite.favoriteDate) }}</span>
                             </div>
                             <div class="flex items-center gap-2">
                                 <button @click="editNotes(favorite)" class="text-blue-500 hover:text-blue-600 text-sm" title="编辑备注">📝</button>
@@ -131,15 +134,10 @@
                         </div>
 
                         <!-- 用户备注 -->
-                        <div v-if="favorite.notes" class="mt-2 p-2 bg-yellow-100 rounded border border-yellow-300">
-                            <div class="text-xs text-gray-600 mb-1">我的备注：</div>
+                        <div v-if="favorite.notes" class="p-2 bg-yellow-50 rounded border border-yellow-200">
+                            <div class="text-xs text-gray-600 mb-1">📝 我的备注：</div>
                             <div class="text-sm text-gray-800">{{ favorite.notes }}</div>
                         </div>
-                    </div>
-
-                    <!-- 菜谱卡片 -->
-                    <div>
-                        <RecipeCard :recipe="favorite.recipe" :showFavoriteButton="false" />
                     </div>
                 </div>
             </div>
@@ -200,7 +198,7 @@
 import { ref, computed, onMounted } from 'vue'
 import type { FavoriteRecipe } from '@/types'
 import { FavoriteService } from '@/services/favoriteService'
-import RecipeCard from '@/components/RecipeCard.vue'
+import RecipeCardV2 from '@/components/recipe/RecipeCardV2.vue'
 import GlobalNavigation from '@/components/GlobalNavigation.vue'
 import GlobalFooter from '@/components/GlobalFooter.vue'
 
