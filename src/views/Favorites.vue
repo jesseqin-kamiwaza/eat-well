@@ -1,105 +1,51 @@
 <template>
-    <div class="min-h-screen bg-yellow-400 px-2 md:px-4 py-6">
-        <!-- 全局导航 -->
-        <GlobalNavigation />
-
-        <div class="max-w-7xl mx-auto">
-            <!-- 页面标题 -->
-            <div class="mb-6">
-                <div class="bg-red-500 text-white px-4 py-2 rounded-t-lg border-2 border-[#0A0910] border-b-0 inline-block">
-                    <span class="font-bold">我的收藏</span>
-                </div>
-                <div class="bg-white border-2 border-[#0A0910] rounded-lg rounded-tl-none p-4 md:p-6">
-                    <div class="flex items-center justify-between">
-                        <div class="flex items-center gap-3">
-                            <div class="w-12 h-12 bg-red-500 rounded-lg flex items-center justify-center">
-                                <span class="text-white text-2xl">❤️</span>
-                            </div>
-                            <div>
-                                <h1 class="text-md font-bold text-gray-800">收藏菜谱</h1>
-                                <p class="text-gray-600 text-xs">共收藏了 {{ favorites.length }} 道菜谱</p>
-                            </div>
-                        </div>
-
-                        <!-- 操作按钮 -->
-                        <div class="flex items-center gap-2">
-                            <!-- <button
-                                @click="refreshFavorites"
-                                class="px-3 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg text-sm font-medium border-2 border-[#0A0910] transition-all duration-200 hover:scale-105"
-                            >
-                                🔄 刷新
-                            </button> -->
-                            <button
-                                v-if="favorites.length > 0"
-                                @click="showClearConfirm = true"
-                                class="px-3 py-2 bg-gray-500 hover:bg-gray-600 text-white rounded-lg text-sm font-medium border-2 border-[#0A0910] transition-all duration-200 hover:scale-105"
-                            >
-                                🗑️ 清空
-                            </button>
-                        </div>
+    <div class="min-h-screen bg-gradient-to-br from-pink-50 to-red-50 pb-20">
+        <div class="max-w-2xl mx-auto">
+            <!-- 简化的页面标题 -->
+            <div class="pt-6 pb-4 px-4">
+                <div class="flex items-center justify-between">
+                    <div>
+                        <h1 class="text-2xl font-bold text-gray-800 mb-2">
+                            我的收藏 ❤️
+                        </h1>
+                        <p class="text-sm text-gray-600">
+                            共收藏了 {{ favorites.length }} 道菜谱
+                        </p>
                     </div>
-
-                    <!-- 统计信息 -->
-                    <div v-if="false" class="grid grid-cols-1 md:grid-cols-3 gap-4 mb-6">
-                        <div class="bg-gradient-to-r from-pink-100 to-red-100 p-4 rounded-lg border-2 border-[#0A0910]">
-                            <div class="flex items-center gap-2">
-                                <span class="text-2xl">📊</span>
-                                <div>
-                                    <div class="text-lg font-bold text-gray-800">{{ stats.total }}</div>
-                                    <div class="text-sm text-gray-600">总收藏数</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-gradient-to-r from-green-100 to-emerald-100 p-4 rounded-lg border-2 border-[#0A0910]">
-                            <div class="flex items-center gap-2">
-                                <span class="text-2xl">👨‍🍳</span>
-                                <div>
-                                    <div class="text-lg font-bold text-gray-800">{{ Object.keys(stats.cuisineStats).length }}</div>
-                                    <div class="text-sm text-gray-600">菜系种类</div>
-                                </div>
-                            </div>
-                        </div>
-
-                        <div class="bg-gradient-to-r from-blue-100 to-cyan-100 p-4 rounded-lg border-2 border-[#0A0910]">
-                            <div class="flex items-center gap-2">
-                                <span class="text-2xl">📅</span>
-                                <div>
-                                    <div class="text-lg font-bold text-gray-800">{{ formatDate(stats.latestFavorite) }}</div>
-                                    <div class="text-sm text-gray-600">最近收藏</div>
-                                </div>
-                            </div>
-                        </div>
-                    </div>
+                    <!-- 清空按钮 -->
+                    <button
+                        v-if="favorites.length > 0"
+                        @click="showClearConfirm = true"
+                        class="px-3 py-2 bg-white text-gray-700 rounded-lg text-sm font-medium border-2 border-black hover:bg-gray-50 active:scale-95 transition-all"
+                    >
+                        🗑️ 清空
+                    </button>
                 </div>
             </div>
 
             <!-- 搜索和筛选 -->
-            <div v-if="favorites.length > 0" class="mb-6">
-                <div class="bg-white border-2 border-[#0A0910] rounded-lg p-4">
-                    <div class="flex flex-col md:flex-row gap-4">
+            <div v-if="favorites.length > 0" class="mb-4 px-4">
+                <div class="card-brutal p-4 bg-white">
+                    <div class="space-y-3">
                         <!-- 搜索框 -->
-                        <div class="flex-1">
-                            <input
-                                v-model="searchQuery"
-                                placeholder="搜索菜谱名称或食材..."
-                                class="w-full p-3 border-2 border-[#0A0910] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-400"
-                            />
-                        </div>
+                        <input
+                            v-model="searchQuery"
+                            placeholder="搜索菜谱名称或食材..."
+                            class="w-full px-4 py-2.5 border-2 border-black rounded-lg text-sm bg-white focus:outline-none focus:border-red-400 transition-all"
+                        />
 
-                        <!-- 菜系筛选 -->
-                        <div class="md:w-48">
-                            <select v-model="selectedCuisine" class="w-full p-3 border-2 border-[#0A0910] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                        <!-- 筛选和排序 -->
+                        <div class="flex gap-2">
+                            <!-- 菜系筛选 -->
+                            <select v-model="selectedCuisine" class="flex-1 px-3 py-2 border-2 border-black rounded-lg text-sm bg-white focus:outline-none focus:border-red-400 transition-all">
                                 <option value="">全部菜系</option>
                                 <option v-for="cuisine in availableCuisines" :key="cuisine" :value="cuisine">
                                     {{ cuisine }}
                                 </option>
                             </select>
-                        </div>
 
-                        <!-- 排序 -->
-                        <div class="md:w-48">
-                            <select v-model="sortBy" class="w-full p-3 border-2 border-[#0A0910] rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-red-400">
+                            <!-- 排序 -->
+                            <select v-model="sortBy" class="flex-1 px-3 py-2 border-2 border-black rounded-lg text-sm bg-white focus:outline-none focus:border-red-400 transition-all">
                                 <option value="date-desc">最新收藏</option>
                                 <option value="date-asc">最早收藏</option>
                                 <option value="name-asc">名称 A-Z</option>
@@ -111,7 +57,7 @@
             </div>
 
             <!-- 收藏列表 -->
-            <div v-if="filteredFavorites.length > 0" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            <div v-if="filteredFavorites.length > 0" class="px-4 space-y-4">
                 <div
                     v-for="favorite in filteredFavorites"
                     :key="favorite.id"
@@ -143,14 +89,14 @@
             </div>
 
             <!-- 空状态 -->
-            <div v-else-if="favorites.length === 0" class="text-center py-6">
-                <div class="bg-white border-2 border-[#0A0910] rounded-lg p-8">
+            <div v-else-if="favorites.length === 0" class="px-4">
+                <div class="card-brutal bg-white p-8 text-center">
                     <div class="text-6xl mb-4">🤍</div>
                     <h3 class="text-xl font-bold text-gray-800 mb-2">还没有收藏任何菜谱</h3>
                     <p class="text-gray-600 mb-6">去生成一些美味的菜谱，然后收藏起来吧！</p>
                     <router-link
                         to="/"
-                        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-lg font-bold border-2 border-[#0A0910] transition-all duration-200 hover:scale-105"
+                        class="inline-flex items-center gap-2 px-6 py-3 bg-gradient-to-r from-red-500 to-pink-500 hover:from-red-600 hover:to-pink-600 text-white rounded-xl font-bold border-2 border-black shadow-brutal-lg hover:shadow-brutal-md active:shadow-brutal-sm active:translate-x-[2px] active:translate-y-[2px] transition-all"
                     >
                         <span>✨</span>
                         <span>开始生成菜谱</span>
@@ -159,14 +105,14 @@
             </div>
 
             <!-- 搜索无结果 -->
-            <div v-else class="text-center py-16">
-                <div class="bg-white border-2 border-[#0A0910] rounded-lg p-8">
+            <div v-else class="px-4">
+                <div class="card-brutal bg-white p-8 text-center">
                     <div class="text-4xl mb-4">🔍</div>
                     <h3 class="text-xl font-bold text-gray-800 mb-2">没有找到匹配的菜谱</h3>
                     <p class="text-gray-600 mb-4">试试调整搜索条件或筛选选项</p>
                     <button
                         @click="clearFilters"
-                        class="px-4 py-2 bg-blue-500 hover:bg-blue-600 text-white rounded-lg font-medium border-2 border-[#0A0910] transition-all duration-200"
+                        class="px-4 py-2 bg-white text-gray-800 rounded-lg font-medium border-2 border-black hover:bg-gray-50 active:scale-95 transition-all"
                     >
                         清除筛选条件
                     </button>
@@ -188,9 +134,6 @@
 
         <!-- 单个删除确认弹窗 -->
         <ConfirmModal v-if="removingRecipeId" title="确认取消收藏" message="确定要取消收藏这道菜谱吗？" @confirm="removeFavorite" @cancel="removingRecipeId = null" />
-
-        <!-- 底部 -->
-        <GlobalFooter />
     </div>
 </template>
 
@@ -199,9 +142,6 @@ import { ref, computed, onMounted } from 'vue'
 import type { FavoriteRecipe } from '@/types'
 import { FavoriteService } from '@/services/favoriteService'
 import RecipeCardV2 from '@/components/recipe/RecipeCardV2.vue'
-import GlobalNavigation from '@/components/GlobalNavigation.vue'
-import GlobalFooter from '@/components/GlobalFooter.vue'
-
 import NotesModal from '@/components/NotesModal.vue'
 import ConfirmModal from '@/components/ConfirmModal.vue'
 
