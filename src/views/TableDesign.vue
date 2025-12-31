@@ -437,10 +437,9 @@
 
         <!-- 底部 -->
         <GlobalFooter />
-    </div>
 
-    <!-- 菜谱弹窗 -->
-    <Teleport to="body">
+        <!-- 菜谱弹窗 -->
+        <Teleport to="body">
         <div v-if="selectedRecipe" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-[9999] p-4 modal-overlay" @click="closeRecipeModal">
             <div
                 class="bg-white rounded-2xl border-2 border-[#0A0910] shadow-2xl max-w-4xl w-full max-h-[90vh] overflow-hidden modal-content transform transition-all duration-300"
@@ -468,7 +467,8 @@
                 </div>
             </div>
         </div>
-    </Teleport>
+        </Teleport>
+    </div>
 </template>
 
 <script setup lang="ts">

@@ -1,4 +1,4 @@
-const CACHE_VERSION = 'v1.0.1'
+const CACHE_VERSION = 'v1.0.2'
 const CACHE_NAME = `yifan-fengshen-${CACHE_VERSION}`
 
 // Static resources to cache
@@ -85,8 +85,9 @@ async function cacheFirst(request) {
 
   try {
     const response = await fetch(request)
-    // Only cache GET requests (Cache API doesn't support POST, PUT, etc.)
-    if (response.ok && request.method === 'GET') {
+    // Only cache GET requests with http/https protocol (Cache API doesn't support POST, chrome-extension, etc.)
+    const url = new URL(request.url)
+    if (response.ok && request.method === 'GET' && url.protocol.startsWith('http')) {
       cache.put(request, response.clone())
     }
     return response
@@ -101,8 +102,9 @@ async function networkFirst(request) {
 
   try {
     const response = await fetch(request)
-    // Only cache GET requests (Cache API doesn't support POST, PUT, etc.)
-    if (response.ok && request.method === 'GET') {
+    // Only cache GET requests with http/https protocol (Cache API doesn't support POST, chrome-extension, etc.)
+    const url = new URL(request.url)
+    if (response.ok && request.method === 'GET' && url.protocol.startsWith('http')) {
       cache.put(request, response.clone())
     }
     return response
@@ -120,8 +122,9 @@ async function staleWhileRevalidate(request) {
   const cached = await cache.match(request)
 
   const fetchPromise = fetch(request).then((response) => {
-    // Only cache GET requests (Cache API doesn't support POST, PUT, etc.)
-    if (response.ok && request.method === 'GET') {
+    // Only cache GET requests with http/https protocol (Cache API doesn't support POST, chrome-extension, etc.)
+    const url = new URL(request.url)
+    if (response.ok && request.method === 'GET' && url.protocol.startsWith('http')) {
       cache.put(request, response.clone())
     }
     return response
