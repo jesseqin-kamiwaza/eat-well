@@ -3,7 +3,6 @@ import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
 import SearchHeader from '@/components/SearchHeader.vue'
 import FilterChips from '@/components/FilterChips.vue'
-import SmartSceneCards, { type SceneCard } from '@/components/SmartSceneCards.vue'
 import RecipeCard from '@/components/RecipeCard.vue'
 import { generateRecipe } from '@/services/aiService'
 import { cuisines } from '@/config/cuisines'
@@ -17,56 +16,71 @@ const recipes = ref<Recipe[]>([])
 const activeFilters = ref<string[]>([])
 const errorMessage = ref('')
 
-// 当前选中的场景
-const currentScene = ref<SceneCard | null>(null)
+// 食材管理
+const selectedIngredients = ref<string[]>([])
+const currentIngredient = ref('')
+
+// 常用食材列表
+const commonIngredients = [
+  '猪肉', '鸡肉', '牛肉', '鸡蛋',
+  '青菜', '土豆', '西红柿', '豆腐',
+  '白菜', '胡萝卜', '洋葱', '大蒜'
+]
 
 // 处理筛选器变化
 const handleFilterChange = (filters: string[]) => {
   activeFilters.value = filters
   console.log('Active filters:', filters)
-  // TODO: 根据筛选条件更新推荐或重新生成菜谱
 }
 
-// 处理场景卡片点击 - 一键生成菜谱
-const handleGenerateWithScene = async (scene: SceneCard) => {
-  currentScene.value = scene
+// 添加食材
+const addIngredient = () => {
+  const ingredient = currentIngredient.value.trim()
+  if (ingredient && !selectedIngredients.value.includes(ingredient)) {
+    selectedIngredients.value.push(ingredient)
+    currentIngredient.value = ''
+  }
+}
+
+// 移除食材
+const removeIngredient = (index: number) => {
+  selectedIngredients.value.splice(index, 1)
+}
+
+// 快捷添加食材
+const quickAddIngredient = (ingredient: string) => {
+  if (!selectedIngredients.value.includes(ingredient)) {
+    selectedIngredients.value.push(ingredient)
+  }
+}
+
+// 根据食材生成菜谱
+const handleGenerateWithIngredients = async () => {
+  if (selectedIngredients.value.length === 0) return
+
   generating.value = true
   errorMessage.value = ''
 
   try {
-    // 根据场景ID选择对应的菜系
-    let cuisineType: CuisineType = cuisines.find((c: CuisineType) => c.id === 'su') || cuisines[0]
-
-    // 根据场景调整菜系选择
-    if (scene.id.includes('quick') || scene.id.includes('breakfast')) {
-      cuisineType = cuisines.find((c: CuisineType) => c.id === 'su') || cuisineType
-    } else if (scene.id.includes('party') || scene.id.includes('special')) {
-      cuisineType = cuisines.find((c: CuisineType) => c.id === 'fusion') || cuisineType
-    } else if (scene.id.includes('healthy') || scene.id.includes('light')) {
-      cuisineType = cuisines.find((c: CuisineType) => c.id === 'su') || cuisineType
-    }
+    // 选择默认菜系（家常菜）
+    const cuisineType: CuisineType = cuisines.find((c: CuisineType) => c.id === 'home-cooking') || cuisines[0]
 
     // 构建自定义提示词
-    let customPrompt = `场景：${scene.name} - ${scene.description}`
+    let customPrompt = `使用这些食材: ${selectedIngredients.value.join('、')}`
 
-    // 添加筛选条件到提示词
+    // 添加筛选条件
     if (activeFilters.value.length > 0) {
       customPrompt += `\n要求：${activeFilters.value.join('、')}`
     }
 
-    // 添加场景标签到提示词
-    if (scene.tags && scene.tags.length > 0) {
-      customPrompt += `\n特点：${scene.tags.join('、')}`
-    }
-
     // 调用AI生成菜谱
     const recipe = await generateRecipe(
-      scene.ingredients || [],
+      selectedIngredients.value,
       cuisineType,
       customPrompt
     )
 
-    // 添加场景信息到菜谱
+    // 添加菜系信息
     recipe.cuisine = cuisineType.name
 
     // 更新菜谱列表
@@ -89,15 +103,16 @@ const handleGenerateWithScene = async (scene: SceneCard) => {
 
 // 重新生成
 const handleRegenerate = () => {
-  if (currentScene.value) {
-    handleGenerateWithScene(currentScene.value)
+  if (selectedIngredients.value.length > 0) {
+    handleGenerateWithIngredients()
   }
 }
 
 // 清除结果
 const clearResults = () => {
   recipes.value = []
-  currentScene.value = null
+  selectedIngredients.value = []
+  currentIngredient.value = ''
   errorMessage.value = ''
 }
 
@@ -135,15 +150,94 @@ const welcomeMessage = computed(() => {
         {{ welcomeMessage }}
       </h1>
       <p class="text-sm text-gray-600">
-        点击下方卡片,AI 为你即刻生成专属菜谱
+        告诉我你有什么食材，AI 为你定制专属菜谱
       </p>
     </div>
 
-    <!-- 智能推荐卡片 - 核心入口 -->
-    <SmartSceneCards
-      v-if="!generating"
-      @generate="handleGenerateWithScene"
-    />
+    <!-- 食材输入区域 - 核心功能 -->
+    <div v-if="!generating && !hasResults" class="px-4 py-6">
+      <div class="card-brutal p-6 bg-white">
+        <!-- 标题 -->
+        <div class="flex items-center gap-2 mb-4">
+          <span class="text-2xl">🥬</span>
+          <h2 class="text-lg font-bold text-gray-800">我有这些食材</h2>
+        </div>
+
+        <!-- 食材输入框 -->
+        <div class="mb-4">
+          <div class="flex gap-2">
+            <input
+              v-model="currentIngredient"
+              @keyup.enter="addIngredient"
+              type="text"
+              placeholder="输入食材（如：猪肉、鸡蛋、青菜）"
+              class="flex-1 px-4 py-3 bg-gray-50 border-2 border-gray-300 rounded-lg text-base
+                     focus:outline-none focus:border-yellow-400 focus:bg-white transition-all"
+            />
+            <button
+              @click="addIngredient"
+              class="px-6 py-3 bg-yellow-400 hover:bg-yellow-500 text-gray-800 font-bold rounded-lg
+                     border-2 border-black active:scale-95 transition-all"
+            >
+              ➕
+            </button>
+          </div>
+
+          <!-- 已添加的食材 -->
+          <div v-if="selectedIngredients.length > 0" class="mt-3 flex flex-wrap gap-2">
+            <span
+              v-for="(ingredient, index) in selectedIngredients"
+              :key="index"
+              class="inline-flex items-center gap-2 px-3 py-1.5 bg-yellow-100 text-gray-800 rounded-full text-sm font-medium border-2 border-yellow-300"
+            >
+              {{ ingredient }}
+              <button
+                @click="removeIngredient(index)"
+                class="text-gray-600 hover:text-red-600 font-bold"
+              >
+                ✕
+              </button>
+            </span>
+          </div>
+        </div>
+
+        <!-- 常用食材快捷按钮 -->
+        <div class="mb-4">
+          <div class="text-xs text-gray-600 mb-2">常用食材：</div>
+          <div class="flex flex-wrap gap-2">
+            <button
+              v-for="ingredient in commonIngredients"
+              :key="ingredient"
+              @click="quickAddIngredient(ingredient)"
+              :disabled="selectedIngredients.includes(ingredient)"
+              :class="[
+                'px-3 py-2 rounded-lg text-sm font-medium border-2 transition-all',
+                selectedIngredients.includes(ingredient)
+                  ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                  : 'bg-white text-gray-700 border-gray-300 hover:border-yellow-400 active:scale-95'
+              ]"
+            >
+              {{ ingredient }}
+            </button>
+          </div>
+        </div>
+
+        <!-- 生成按钮 -->
+        <button
+          @click="handleGenerateWithIngredients"
+          :disabled="selectedIngredients.length === 0"
+          class="w-full py-4 bg-gradient-to-r from-yellow-400 to-pink-400 text-white font-bold rounded-xl
+                 border-2 border-black shadow-brutal-lg
+                 hover:shadow-brutal-md active:shadow-brutal-sm
+                 active:translate-x-[2px] active:translate-y-[2px]
+                 transition-all duration-200
+                 disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:shadow-brutal-lg"
+        >
+          <span v-if="selectedIngredients.length === 0">请先添加食材</span>
+          <span v-else>✨ 开始生成菜谱（{{ selectedIngredients.length }}种食材）</span>
+        </button>
+      </div>
+    </div>
 
     <!-- 加载状态 -->
     <div v-if="generating" class="px-4 py-12">
@@ -151,8 +245,17 @@ const welcomeMessage = computed(() => {
         <div class="animate-spin text-6xl mb-4">🍳</div>
         <h3 class="text-xl font-bold text-gray-800 mb-2">AI 大厨正在烹饪...</h3>
         <p class="text-sm text-gray-600">
-          为 "{{ currentScene?.name }}" 生成专属菜谱
+          根据 {{ selectedIngredients.length }} 种食材生成专属菜谱
         </p>
+        <div class="mt-3 flex flex-wrap justify-center gap-2">
+          <span
+            v-for="ingredient in selectedIngredients"
+            :key="ingredient"
+            class="px-2 py-1 bg-yellow-100 text-gray-700 rounded-full text-xs"
+          >
+            {{ ingredient }}
+          </span>
+        </div>
       </div>
     </div>
 
@@ -180,7 +283,7 @@ const welcomeMessage = computed(() => {
       <!-- 结果头部 -->
       <div class="flex items-center justify-between mb-4">
         <h2 class="text-lg font-bold text-gray-800">
-          为你推荐 - {{ currentScene?.name }}
+          为你推荐 - 基于你的食材
         </h2>
         <div class="flex gap-2">
           <button
