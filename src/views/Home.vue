@@ -76,6 +76,12 @@ const quickAddIngredient = (ingredient: string) => {
   }
 }
 
+// 聚焦到输入框（点击"手动输入"提示时）
+const inputRef = ref<HTMLInputElement | null>(null)
+const focusInput = () => {
+  inputRef.value?.focus()
+}
+
 // 根据食材生成菜谱
 const handleGenerateWithIngredients = async () => {
   if (selectedIngredients.value.length === 0) return
@@ -186,6 +192,7 @@ const hasResults = computed(() => recipes.value.length > 0)
         <div class="mb-3">
           <div class="flex gap-2">
             <input
+              ref="inputRef"
               v-model="currentIngredient"
               @keyup.enter="addIngredient"
               type="text"
@@ -248,12 +255,15 @@ const hasResults = computed(() => recipes.value.length > 0)
               >
                 {{ ingredient }}
               </button>
-              <!-- 手动输入提示 -->
-              <div class="w-full mt-1 text-center">
-                <span class="text-xs text-gray-500">
-                  💡 没找到？请在上方输入框手动添加
-                </span>
-              </div>
+              <!-- 手动输入提示按钮 -->
+              <button
+                @click="focusInput"
+                class="px-2.5 py-1 rounded-lg text-xs font-medium border-2 border-dashed border-gray-400
+                       bg-gray-50 text-gray-600 hover:bg-gray-100 hover:border-gray-500
+                       active:scale-95 transition-all"
+              >
+                ↑ 手动输入
+              </button>
             </div>
           </div>
         </div>
