@@ -341,3 +341,28 @@ Special handling:
   }
 }
 </script>
+
+<style scoped>
+.step-ingredients {
+  /* Ensure full height usage */
+  min-height: 100%;
+}
+
+@keyframes pop-in {
+  0% {
+    opacity: 0;
+    transform: scale(0.5);
+  }
+  50% {
+    transform: scale(1.1);
+  }
+  100% {
+    opacity: 1;
+    transform: scale(1);
+  }
+}
+
+.animate-pop-in {
+  animation: pop-in 0.3s cubic-bezier(0.175, 0.885, 0.32, 1.275) forwards;
+}
+</style>

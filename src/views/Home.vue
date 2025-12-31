@@ -1,33 +1,28 @@
 <template>
-  <div class="home-wizard min-h-screen bg-gradient-to-br from-yellow-50 to-pink-50">
-    <!-- Progress indicator -->
-    <div class="fixed top-0 left-0 right-0 z-40 bg-white border-b-2 border-black">
-      <div class="h-1 bg-gray-200">
-        <div
-          class="h-full bg-gradient-to-r from-yellow-400 to-pink-400 transition-all duration-300"
-          :style="{ width: `${wizard.progress.value}%` }"
-        ></div>
-      </div>
-      <div class="px-4 py-3 flex items-center justify-between">
-        <button
-          v-if="!wizard.isFirstStep.value"
-          @click="wizard.goPrev()"
-          class="p-2 text-gray-600 active:scale-95 transition-transform font-medium"
-        >
-          ← 上一步
-        </button>
-        <div v-else class="w-16"></div>
-        <h2 class="text-base md:text-lg font-bold">
-          {{ wizard.currentStepData.value.icon }}
-          {{ wizard.currentStepData.value.title }}
-          ({{ wizard.currentStep.value + 1 }}/{{ steps.length }})
-        </h2>
-        <div class="w-16"></div>
-      </div>
+  <div class="home-wizard min-h-screen bg-gradient-to-br from-yellow-50 to-pink-50 pb-20">
+    <!-- Mobile NavBar -->
+    <NavBar
+      :title="wizardTitle"
+      :show-back="!wizard.isFirstStep.value"
+      @back="wizard.goPrev()"
+    >
+      <template #right>
+        <span class="text-xs font-bold text-gray-400 bg-gray-100 px-2 py-1 rounded-full border border-gray-200">
+          {{ wizard.currentStep.value + 1 }}/{{ steps.length }}
+        </span>
+      </template>
+    </NavBar>
+
+    <!-- Progress Bar (below NavBar) -->
+    <div class="fixed top-14 left-0 right-0 z-40 bg-gray-100 h-1 mt-[env(safe-area-inset-top)]">
+      <div
+        class="h-full bg-gradient-to-r from-yellow-400 to-pink-400 transition-all duration-300"
+        :style="{ width: `${wizard.progress.value}%` }"
+      ></div>
     </div>
 
     <!-- Step content -->
-    <div class="pt-24 pb-28 px-0 md:px-4 max-w-4xl mx-auto">
+    <div class="pt-8 px-0 md:px-4 max-w-4xl mx-auto min-h-[calc(100vh-140px)] flex flex-col justify-center">
       <Transition name="slide-fade" mode="out-in">
         <component
           :is="currentStepComponent"
@@ -38,16 +33,16 @@
     </div>
 
     <!-- Bottom action buttons - fixed for mobile -->
-    <div class="fixed bottom-20 md:bottom-4 left-0 right-0 px-4 pb-4 bg-gradient-to-t from-white via-white to-transparent z-30">
+    <div class="fixed bottom-20 md:bottom-4 left-0 right-0 px-4 pb-4 bg-gradient-to-t from-white/90 via-white/80 to-transparent z-30 pt-6">
       <div class="max-w-4xl mx-auto">
         <button
           v-if="!wizard.isLastStep.value"
           @click="handleNext"
           :disabled="!canProceed"
-          class="w-full py-4 text-lg font-bold rounded-xl border-2 border-black transition-all active:scale-95"
+          class="w-full py-4 text-lg font-bold rounded-xl border-2 border-black transition-all active:scale-95 shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
           :class="canProceed
-            ? 'bg-gradient-to-r from-yellow-400 to-pink-400 text-white hover:from-yellow-500 hover:to-pink-500'
-            : 'bg-gray-200 text-gray-400 cursor-not-allowed'"
+            ? 'bg-yellow-400 text-black'
+            : 'bg-gray-200 text-gray-400 cursor-not-allowed shadow-none border-gray-300'"
         >
           下一步 →
         </button>
@@ -55,7 +50,7 @@
           v-else
           @click="generateRecipes"
           :disabled="generating"
-          class="w-full py-4 text-lg font-bold bg-gradient-to-r from-orange-500 to-red-500 hover:from-orange-600 hover:to-red-600 text-white rounded-xl border-2 border-black active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
+          class="w-full py-4 text-lg font-bold bg-pink-500 text-white rounded-xl border-2 border-black active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed shadow-[4px_4px_0px_0px_rgba(0,0,0,1)] hover:shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] hover:translate-x-[2px] hover:translate-y-[2px]"
         >
           <span class="flex items-center gap-2 justify-center">
             <template v-if="generating">
@@ -176,6 +171,7 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useWizard } from '@/composables/useWizard'
+import NavBar from '@/components/NavBar.vue'
 import StepIngredients from './wizard-steps/StepIngredients.vue'
 import StepCuisine from './wizard-steps/StepCuisine.vue'
 import StepConfirm from './wizard-steps/StepConfirm.vue'
@@ -229,6 +225,10 @@ interface CuisineSlot {
   errorMessage?: string
 }
 const cuisineSlots = ref<CuisineSlot[]>([])
+
+const wizardTitle = computed(() => {
+  return `${wizard.currentStepData.value.icon} ${wizard.currentStepData.value.title}`
+})
 
 // Current step component
 const currentStepComponent = computed(() => {

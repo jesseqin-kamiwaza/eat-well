@@ -1,182 +1,151 @@
 <template>
-  <div class="step-cuisine p-4">
-    <h2 class="text-2xl font-bold mb-6">选择菜系</h2>
-
-    <!-- Custom prompt warning -->
-    <div v-if="modelValue.customRequirements.trim()" class="mb-4 p-3 bg-blue-50 border-2 border-blue-200 rounded-lg text-center">
-      <p class="text-sm text-blue-700 mb-2">✓ 已设置自定义要求，将优先使用自定义要求生成菜谱</p>
-      <button @click="clearCustomPrompt" class="text-blue-600 hover:text-blue-700 underline text-sm">
-        清除自定义要求以选择菜系
-      </button>
-    </div>
-
-    <!-- Chinese cuisines -->
-    <div class="mb-4" :class="{ 'opacity-50': modelValue.customRequirements.trim() }">
-      <h5 class="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1">🇨🇳 中华八大菜系</h5>
-      <div class="grid grid-cols-3 gap-2">
-        <button
-          v-for="cuisine in chineseCuisines"
-          :key="cuisine.id"
-          @click="selectCuisine(cuisine.id)"
-          :class="[
-            'p-2 rounded-lg border-2 border-black font-medium text-sm transition-all duration-200 relative flex items-center justify-center gap-1',
-            selectedCuisines.includes(cuisine.id)
-              ? 'bg-yellow-400 text-dark-800'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          ]"
-        >
-          <span>{{ cuisine.avatar }}</span>
-          <span>{{ cuisine.name.replace('大师', '') }}</span>
+  <div class="step-cuisine h-full overflow-y-auto pb-24">
+    <!-- Custom prompt warning (Sticky at top if active) -->
+    <div v-if="modelValue.customRequirements.trim()" class="sticky top-0 z-10 mb-4 p-3 bg-blue-50/95 backdrop-blur border-b-2 border-blue-200 shadow-sm animate-slide-down">
+      <div class="flex items-start justify-between gap-2">
+        <p class="text-xs text-blue-700 font-medium">✨ 已设置自定义要求，将优先使用此要求</p>
+        <button @click="clearCustomPrompt" class="text-blue-500 hover:text-blue-700 text-xs px-2 py-1 bg-white rounded border border-blue-200">
+          清除
         </button>
       </div>
     </div>
 
-    <!-- International cuisines -->
-    <div class="mb-6" :class="{ 'opacity-50': modelValue.customRequirements.trim() }">
-      <h5 class="text-xs font-bold text-gray-700 mb-2 flex items-center gap-1">🌍 国际菜系</h5>
-      <div class="grid grid-cols-3 gap-2">
-        <button
-          v-for="cuisine in internationalCuisines"
-          :key="cuisine.id"
-          @click="selectCuisine(cuisine.id)"
-          :class="[
-            'p-2 rounded-lg border-2 border-black font-medium text-sm transition-all duration-200 relative flex items-center justify-center gap-1',
-            selectedCuisines.includes(cuisine.id)
-              ? 'bg-yellow-400 text-dark-800'
-              : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
-          ]"
-        >
-          <span>{{ cuisine.avatar }}</span>
-          <span>{{ cuisine.name.replace('料理大师', '').replace('大师', '') }}</span>
-        </button>
-      </div>
-    </div>
-
-    <!-- Custom requirements -->
-    <div class="border-t border-gray-200 pt-4">
-      <!-- Toggle button -->
-      <button
-        @click="showCustomPrompt = !showCustomPrompt"
-        class="flex items-center justify-between w-full p-3 text-sm text-gray-700 hover:text-gray-900 hover:bg-blue-50 rounded-lg border-2 border-blue-200 hover:border-blue-300 transition-all duration-200 mb-3"
-        :class="{ 'bg-blue-50 border-blue-300': showCustomPrompt || modelValue.customRequirements.trim() }"
-      >
-        <span class="flex items-center gap-2">
-          <span class="text-base">💭</span>
-          <span class="font-medium">或自定义要求</span>
-          <span v-if="modelValue.customRequirements.trim()" class="text-xs bg-blue-500 text-white px-2 py-1 rounded-full">已设置</span>
-        </span>
-        <span
-          class="transform transition-transform duration-200 text-gray-400"
-          :class="{ 'rotate-180': showCustomPrompt }"
-        >
-          <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-          </svg>
-        </span>
-      </button>
-
-      <!-- Custom requirements content -->
-      <div v-if="showCustomPrompt" class="bg-blue-100 border-2 border-blue-300 rounded-lg p-3">
-        <!-- Quick presets -->
-        <div class="mb-3">
+    <div class="space-y-6">
+      <!-- Chinese cuisines -->
+      <div class="animate-fade-in" :class="{ 'opacity-50 pointer-events-none grayscale': modelValue.customRequirements.trim() }">
+        <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-1 flex items-center gap-1">
+          🇨🇳 中华八大菜系
+        </h5>
+        <div class="grid grid-cols-3 gap-3">
           <button
-            @click="showPresetPicker = !showPresetPicker"
-            class="flex items-center justify-between w-full p-2 text-sm text-gray-700 hover:text-gray-900 hover:bg-white/50 rounded-lg border border-blue-200 hover:border-blue-300 transition-all duration-200 mb-2"
+            v-for="cuisine in chineseCuisines"
+            :key="cuisine.id"
+            @click="selectCuisine(cuisine.id)"
+            :class="[
+              'p-3 rounded-xl border-2 border-black font-medium text-sm transition-all duration-200 flex flex-col items-center justify-center gap-2 aspect-square active:scale-95',
+              selectedCuisines.includes(cuisine.id)
+                ? 'bg-yellow-400 text-dark-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-x-[1px] translate-y-[1px]'
+                : 'bg-white text-gray-700 hover:bg-gray-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]'
+            ]"
           >
-            <span class="flex items-center gap-2">
-              <span class="text-base">⚡</span>
-              <span class="font-medium">快速预设</span>
-            </span>
-            <span
-              class="transform transition-transform duration-200 text-gray-400"
-              :class="{ 'rotate-180': showPresetPicker }"
-            >
-              <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-              </svg>
-            </span>
+            <span class="text-2xl">{{ cuisine.avatar }}</span>
+            <span class="text-xs font-bold">{{ cuisine.name.replace('大师', '') }}</span>
           </button>
+        </div>
+      </div>
 
-          <div
+      <!-- International cuisines -->
+      <div class="animate-fade-in" style="animation-delay: 0.1s" :class="{ 'opacity-50 pointer-events-none grayscale': modelValue.customRequirements.trim() }">
+        <h5 class="text-xs font-bold text-gray-500 uppercase tracking-wider mb-3 px-1 flex items-center gap-1">
+          🌍 国际菜系
+        </h5>
+        <div class="grid grid-cols-3 gap-3">
+          <button
+            v-for="cuisine in internationalCuisines"
+            :key="cuisine.id"
+            @click="selectCuisine(cuisine.id)"
+            :class="[
+              'p-3 rounded-xl border-2 border-black font-medium text-sm transition-all duration-200 flex flex-col items-center justify-center gap-2 aspect-square active:scale-95',
+              selectedCuisines.includes(cuisine.id)
+                ? 'bg-yellow-400 text-dark-800 shadow-[2px_2px_0px_0px_rgba(0,0,0,1)] translate-x-[1px] translate-y-[1px]'
+                : 'bg-white text-gray-700 hover:bg-gray-50 shadow-[4px_4px_0px_0px_rgba(0,0,0,0.1)]'
+            ]"
+          >
+            <span class="text-2xl">{{ cuisine.avatar }}</span>
+            <span class="text-xs font-bold">{{ cuisine.name.replace('料理大师', '').replace('大师', '') }}</span>
+          </button>
+        </div>
+      </div>
+
+      <!-- Custom requirements -->
+      <div class="border-t-2 border-dashed border-gray-200 pt-6 animate-fade-in" style="animation-delay: 0.2s">
+        <!-- Toggle button -->
+        <button
+          @click="showCustomPrompt = !showCustomPrompt"
+          class="flex items-center justify-between w-full p-4 bg-blue-50 text-sm text-gray-800 rounded-xl border-2 border-blue-200 active:scale-[0.98] transition-all duration-200 shadow-sm"
+          :class="{ 'border-blue-400 ring-2 ring-blue-100': showCustomPrompt || modelValue.customRequirements.trim() }"
+        >
+          <div class="flex flex-col items-start gap-1">
+            <span class="flex items-center gap-2 font-bold text-blue-900">
+              <span class="text-xl">💭</span>
+              自定义要求
+            </span>
+            <span class="text-xs text-blue-600 pl-7">例如：口味偏好、特定场景、忌口...</span>
+          </div>
+          <span
+            class="transform transition-transform duration-200 text-blue-400 bg-white rounded-full p-1"
+            :class="{ 'rotate-180': showCustomPrompt }"
+          >
+            <svg class="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
+            </svg>
+          </span>
+        </button>
+
+        <!-- Custom requirements content -->
+        <div v-if="showCustomPrompt" class="mt-4 animate-slide-down">
+          <!-- Quick presets -->
+          <div class="mb-4 overflow-x-auto pb-2 -mx-1 px-1">
+             <div class="flex gap-2 min-w-max">
+                <button
+                  v-for="preset in [...scenePresets.slice(0,3), ...tastePresets.slice(0,3)]"
+                  :key="preset.id"
+                  @click="applyPreset(preset.prompt)"
+                  class="px-3 py-1.5 text-xs font-medium rounded-full border bg-white shadow-sm active:scale-95 transition-all whitespace-nowrap"
+                  :class="preset.id.includes('light') || preset.id.includes('spicy') ? 'border-green-300 text-green-700' : 'border-blue-300 text-blue-700'"
+                >
+                  {{ preset.name }}
+                </button>
+                 <button
+                  @click="showPresetPicker = !showPresetPicker"
+                  class="px-3 py-1.5 text-xs font-medium rounded-full border border-gray-300 bg-gray-50 text-gray-600 active:scale-95"
+                 >
+                   更多...
+                 </button>
+             </div>
+          </div>
+
+           <div
             v-if="showPresetPicker"
-            class="space-y-2 mb-3 p-2 bg-white/70 rounded-lg border border-blue-200 shadow-sm max-h-40 overflow-y-auto"
+            class="mb-4 p-3 bg-white rounded-xl border border-gray-200 shadow-sm animate-fade-in"
           >
-            <!-- Scene presets -->
-            <div>
-              <h6 class="text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">🎯 场景需求</h6>
-              <div class="flex flex-wrap gap-1">
-                <button
-                  v-for="preset in scenePresets"
+             <h6 class="text-xs font-bold text-gray-400 mb-2 uppercase">更多场景与口味</h6>
+             <div class="flex flex-wrap gap-2">
+                 <button
+                  v-for="preset in [...scenePresets.slice(3), ...tastePresets.slice(3)]"
                   :key="preset.id"
                   @click="applyPreset(preset.prompt)"
-                  class="px-2 py-1 text-xs font-medium rounded-full border border-blue-300 hover:border-blue-400 hover:bg-blue-50 hover:text-blue-700 transition-all duration-200"
-                >
-                  {{ preset.name }}
-                </button>
-              </div>
-            </div>
+                   class="px-2 py-1 text-xs font-medium rounded-lg border border-gray-200 bg-gray-50 hover:bg-gray-100"
+                 >
+                   {{ preset.name }}
+                 </button>
+             </div>
+          </div>
 
-            <!-- Taste presets -->
-            <div>
-              <h6 class="text-xs font-medium text-gray-700 mb-1 flex items-center gap-1">👅 口味偏好</h6>
-              <div class="flex flex-wrap gap-1">
-                <button
-                  v-for="preset in tastePresets"
-                  :key="preset.id"
-                  @click="applyPreset(preset.prompt)"
-                  class="px-2 py-1 text-xs font-medium rounded-full border border-green-300 hover:border-green-400 hover:bg-green-50 hover:text-green-700 transition-all duration-200"
-                >
-                  {{ preset.name }}
-                </button>
-              </div>
+          <!-- Custom input -->
+          <div class="relative">
+            <textarea
+              v-model="customInput"
+              @input="limitCustomPrompt"
+              placeholder="在这里告诉AI厨师你的具体要求..."
+              class="w-full p-4 border-2 border-blue-300 rounded-xl text-sm resize-none focus:outline-none focus:ring-4 focus:ring-blue-100 focus:border-blue-500 min-h-[120px] shadow-inner bg-white"
+              maxlength="200"
+            ></textarea>
+            <div class="absolute bottom-3 right-3 text-xs text-gray-400 font-mono bg-white/80 px-1 rounded">
+              {{ customInput.length }}/200
             </div>
           </div>
-        </div>
-
-        <!-- Custom input -->
-        <div>
-          <label class="block text-sm font-bold text-blue-800 mb-2">自由描述：</label>
-          <textarea
-            v-model="customInput"
-            @input="limitCustomPrompt"
-            placeholder="例如：做一道清淡的汤，适合老人食用，不要太咸..."
-            class="w-full p-2 border-2 border-blue-300 rounded-lg text-sm resize-none focus:outline-none focus:border-blue-500 h-20"
-            maxlength="200"
-          ></textarea>
-          <div v-if="customInput.trim()" class="mt-1 flex justify-between items-center">
-            <span class="text-xs text-green-600">✓ 已设置自定义要求</span>
-            <button @click="customInput = ''; updateCustomRequirements()" class="text-xs text-red-600 hover:text-red-700 underline">清除</button>
-          </div>
-        </div>
-
-        <!-- Random inspiration -->
-        <div class="mt-2">
-          <button
+          
+           <!-- Random inspiration -->
+           <button
             @click="getRandomInspiration"
-            class="w-full py-1.5 px-2 bg-gradient-to-r from-purple-400 to-pink-400 hover:from-purple-500 hover:to-pink-500 text-white text-sm font-medium rounded-lg border-2 border-black transition-all duration-200 transform active:scale-95"
+            class="mt-3 w-full py-3 bg-gradient-to-r from-purple-50 to-pink-50 hover:from-purple-100 hover:to-pink-100 text-purple-700 text-sm font-bold rounded-xl border border-purple-200 dashed flex items-center justify-center gap-2 active:scale-[0.99] transition-all"
           >
-            ✨ 随机灵感
+            <span>✨</span>
+            <span>不知道写什么？点我获取灵感</span>
           </button>
         </div>
-
-        <!-- Bottom hint -->
-        <div class="mt-2 pt-2 border-t border-blue-200">
-          <div class="flex items-center justify-between text-xs text-blue-600">
-            <span>💡 提示：越具体越好！</span>
-            <span :class="{ 'text-red-500': customInput.length > 180 }">{{ customInput.length }}/200</span>
-          </div>
-        </div>
       </div>
-    </div>
-
-    <!-- Helpful tips -->
-    <div class="mt-6 bg-green-50 border-2 border-green-200 rounded-lg p-3 text-sm text-green-700">
-      <p class="mb-1">💡 <strong>小提示:</strong></p>
-      <ul class="text-xs space-y-1 ml-4">
-        <li>• 可以选择多个菜系，大师们会各显神通</li>
-        <li>• 使用自定义要求可以更精确控制菜谱风格</li>
-        <li>• 未选择菜系时，系统会随机推荐</li>
-      </ul>
     </div>
   </div>
 </template>
@@ -328,3 +297,21 @@ watch(customInput, () => {
   updateCustomRequirements()
 })
 </script>
+
+<style scoped>
+@keyframes fade-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+@keyframes slide-down {
+  from { opacity: 0; transform: translateY(-10px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+
+.animate-fade-in {
+  animation: fade-in 0.4s ease-out forwards;
+}
+.animate-slide-down {
+  animation: slide-down 0.3s ease-out forwards;
+}
+</style>
