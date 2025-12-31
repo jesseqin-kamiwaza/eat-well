@@ -1,8 +1,6 @@
 <script setup lang="ts">
 import { ref, computed } from 'vue'
 import { useRouter } from 'vue-router'
-import SearchHeader from '@/components/SearchHeader.vue'
-import FilterChips from '@/components/FilterChips.vue'
 import RecipeCard from '@/components/RecipeCard.vue'
 import { generateRecipe } from '@/services/aiService'
 import { cuisines } from '@/config/cuisines'
@@ -13,7 +11,6 @@ const router = useRouter()
 // 状态管理
 const generating = ref(false)
 const recipes = ref<Recipe[]>([])
-const activeFilters = ref<string[]>([])
 const errorMessage = ref('')
 
 // 食材管理
@@ -57,12 +54,6 @@ const cuisineOptions = [
   { id: 'min', name: '闽菜', emoji: '🦀' },
   { id: 'hui', name: '徽菜', emoji: '🐷' }
 ]
-
-// 处理筛选器变化
-const handleFilterChange = (filters: string[]) => {
-  activeFilters.value = filters
-  console.log('Active filters:', filters)
-}
 
 // 添加食材
 const addIngredient = () => {
@@ -115,11 +106,6 @@ const handleGenerateWithIngredients = async () => {
       customPrompt += `\n要求：${cuisineName}风味`
     }
 
-    // 添加筛选条件
-    if (activeFilters.value.length > 0) {
-      customPrompt += `，${activeFilters.value.join('、')}`
-    }
-
     // 调用AI生成菜谱
     const recipe = await generateRecipe(
       selectedIngredients.value,
@@ -170,33 +156,19 @@ const clearResults = () => {
 
 // 计算是否显示结果区域
 const hasResults = computed(() => recipes.value.length > 0)
-
-// 页面加载时的欢迎提示
-const welcomeMessage = computed(() => {
-  const hour = new Date().getHours()
-  if (hour >= 5 && hour < 9) return '早上好! 开始今天的美味旅程吧 ☀️'
-  if (hour >= 9 && hour < 12) return '上午好! 准备做点什么好吃的? 🍳'
-  if (hour >= 12 && hour < 14) return '午餐时间! 看看有什么想吃的 🍱'
-  if (hour >= 14 && hour < 17) return '下午好! 为晚餐做点准备吧 ☕'
-  if (hour >= 17 && hour < 20) return '晚上好! 今天吃什么呢? 🌆'
-  return '夜深了,来点夜宵如何? 🌙'
-})
 </script>
 
 <template>
   <div class="min-h-screen bg-gradient-to-br from-yellow-50 to-pink-50 pb-20">
-    <!-- 搜索头部 -->
-    <SearchHeader />
-
-    <!-- 快速筛选 -->
-    <FilterChips @change="handleFilterChange" />
+    <!-- 顶部预留区域 (未来可添加Banner) -->
+    <div class="h-2"></div>
 
     <!-- 欢迎消息 -->
-    <div v-if="!hasResults && !generating" class="px-4 pt-4 pb-3">
-      <h1 class="text-xl font-bold text-gray-800 mb-1">
-        {{ welcomeMessage }}
+    <div v-if="!hasResults && !generating" class="px-4 pt-6 pb-4">
+      <h1 class="text-2xl font-bold text-gray-800 mb-2">
+        今天做什么菜？🍳
       </h1>
-      <p class="text-xs text-gray-600">
+      <p class="text-sm text-gray-600">
         选择食材 + 菜系，AI 为你定制专属菜谱
       </p>
     </div>
@@ -276,6 +248,12 @@ const welcomeMessage = computed(() => {
               >
                 {{ ingredient }}
               </button>
+              <!-- 手动输入提示 -->
+              <div class="w-full mt-1 text-center">
+                <span class="text-xs text-gray-500">
+                  💡 没找到？请在上方输入框手动添加
+                </span>
+              </div>
             </div>
           </div>
         </div>
