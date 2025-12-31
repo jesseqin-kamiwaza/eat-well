@@ -20,27 +20,26 @@ const errorMessage = ref('')
 const selectedIngredients = ref<string[]>([])
 const currentIngredient = ref('')
 
-// 食材分类（肉类、蔬菜、主食）
-const activeCategory = ref('meat')
-
+// 食材分类（肉类、蔬菜）- 全部展开，不用Tab
 const ingredientCategories = [
   {
     id: 'meat',
     name: '肉类',
     emoji: '🥩',
-    items: ['猪肉', '牛肉', '鸡肉', '鸭肉', '鱼肉', '虾', '蟹', '贝类']
+    items: [
+      '猪肉', '牛肉', '鸡肉', '鸭肉', '鱼肉', '虾', '蟹', '贝类',
+      '羊肉', '排骨', '鸡翅', '鸡腿', '牛排', '五花肉', '里脊', '鱿鱼'
+    ]
   },
   {
     id: 'vegetable',
     name: '蔬菜',
     emoji: '🥬',
-    items: ['青菜', '白菜', '土豆', '西红柿', '豆腐', '胡萝卜', '洋葱', '大蒜', '茄子', '黄瓜', '西兰花', '豆角']
-  },
-  {
-    id: 'staple',
-    name: '主食',
-    emoji: '🍚',
-    items: ['米饭', '面条', '馒头', '面包', '土豆', '红薯', '玉米', '意面']
+    items: [
+      '青菜', '白菜', '土豆', '西红柿', '豆腐', '胡萝卜', '洋葱', '大蒜',
+      '茄子', '黄瓜', '西兰花', '豆角', '菠菜', '芹菜', '生菜', '蘑菇',
+      '青椒', '南瓜', '冬瓜', '丝瓜', '苦瓜', '藕', '山药', '木耳'
+    ]
   }
 ]
 
@@ -58,12 +57,6 @@ const cuisineOptions = [
   { id: 'min', name: '闽菜', emoji: '🦀' },
   { id: 'hui', name: '徽菜', emoji: '🐷' }
 ]
-
-// 计算当前分类的食材列表
-const currentIngredients = computed(() => {
-  const category = ingredientCategories.find(cat => cat.id === activeCategory.value)
-  return category?.items || []
-})
 
 // 处理筛选器变化
 const handleFilterChange = (filters: string[]) => {
@@ -170,10 +163,10 @@ const clearResults = () => {
   errorMessage.value = ''
 }
 
-// 跳转到高级模式(旧版wizard)
-const goToAdvancedMode = () => {
-  router.push('/home-wizard')
-}
+// 跳转到高级模式(旧版wizard) - 暂时隐藏
+// const goToAdvancedMode = () => {
+//   router.push('/home-wizard')
+// }
 
 // 计算是否显示结果区域
 const hasResults = computed(() => recipes.value.length > 0)
@@ -255,58 +248,48 @@ const welcomeMessage = computed(() => {
           </div>
         </div>
 
-        <!-- 食材分类Tab -->
-        <div class="mb-3">
-          <div class="flex gap-2 mb-2 border-b-2 border-gray-100">
-            <button
-              v-for="category in ingredientCategories"
-              :key="category.id"
-              @click="activeCategory = category.id"
-              :class="[
-                'px-3 py-2 text-sm font-medium transition-all relative',
-                activeCategory === category.id
-                  ? 'text-gray-800'
-                  : 'text-gray-500 hover:text-gray-700'
-              ]"
-            >
-              <span class="mr-1">{{ category.emoji }}</span>
-              {{ category.name }}
-              <div
-                v-if="activeCategory === category.id"
-                class="absolute bottom-0 left-0 right-0 h-0.5 bg-yellow-400"
-              ></div>
-            </button>
-          </div>
+        <!-- 食材分类（全部展开） -->
+        <div class="mb-3 space-y-3">
+          <div
+            v-for="category in ingredientCategories"
+            :key="category.id"
+          >
+            <!-- 分类标题 -->
+            <div class="flex items-center gap-1 mb-2">
+              <span class="text-base">{{ category.emoji }}</span>
+              <span class="text-xs font-medium text-gray-600">{{ category.name }}：</span>
+            </div>
 
-          <!-- 当前分类的食材按钮 -->
-          <div class="flex flex-wrap gap-2">
-            <button
-              v-for="ingredient in currentIngredients"
-              :key="ingredient"
-              @click="quickAddIngredient(ingredient)"
-              :disabled="selectedIngredients.includes(ingredient)"
-              :class="[
-                'px-3 py-1.5 rounded-lg text-xs font-medium border-2 transition-all',
-                selectedIngredients.includes(ingredient)
-                  ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
-                  : 'bg-white text-gray-700 border-gray-300 hover:border-yellow-400 active:scale-95'
-              ]"
-            >
-              {{ ingredient }}
-            </button>
+            <!-- 食材按钮 -->
+            <div class="flex flex-wrap gap-1.5">
+              <button
+                v-for="ingredient in category.items"
+                :key="ingredient"
+                @click="quickAddIngredient(ingredient)"
+                :disabled="selectedIngredients.includes(ingredient)"
+                :class="[
+                  'px-2.5 py-1 rounded-lg text-xs font-medium border-2 transition-all',
+                  selectedIngredients.includes(ingredient)
+                    ? 'bg-gray-100 text-gray-400 border-gray-300 cursor-not-allowed'
+                    : 'bg-white text-gray-700 border-gray-300 hover:border-yellow-400 active:scale-95'
+                ]"
+              >
+                {{ ingredient }}
+              </button>
+            </div>
           </div>
         </div>
 
-        <!-- 菜系选择 -->
+        <!-- 菜系选择（换行显示，不横向滚动） -->
         <div class="mb-3 pb-3 border-b-2 border-gray-100">
           <div class="text-xs text-gray-600 mb-2">选择菜系：</div>
-          <div class="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+          <div class="flex flex-wrap gap-2">
             <button
               v-for="cuisine in cuisineOptions"
               :key="cuisine.id"
               @click="selectedCuisine = cuisine.id"
               :class="[
-                'px-3 py-1.5 rounded-full text-xs font-medium border-2 whitespace-nowrap transition-all flex-shrink-0',
+                'px-3 py-1.5 rounded-full text-xs font-medium border-2 transition-all',
                 selectedCuisine === cuisine.id
                   ? 'bg-black text-white border-black shadow-brutal-sm'
                   : 'bg-white text-gray-700 border-gray-300 hover:border-gray-400 active:scale-95'
@@ -434,25 +417,15 @@ const welcomeMessage = computed(() => {
       </div>
     </div>
 
-    <!-- 高级选项 (wizard模式入口) -->
-    <div v-if="!hasResults && !generating" class="px-4 pb-4">
+    <!-- 高级选项 (wizard模式入口) - 暂时隐藏 -->
+    <!-- <div v-if="!hasResults && !generating" class="px-4 pb-4">
       <button
         @click="goToAdvancedMode"
         class="w-full text-xs text-gray-500 hover:text-gray-700 underline py-2"
       >
         使用高级模式 (3步精确配置) →
       </button>
-    </div>
+    </div> -->
   </div>
 </template>
 
-<style scoped>
-/* 隐藏滚动条但保留滚动功能 */
-.scrollbar-hide::-webkit-scrollbar {
-  display: none;
-}
-.scrollbar-hide {
-  -ms-overflow-style: none;
-  scrollbar-width: none;
-}
-</style>
